@@ -123,6 +123,47 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
+        .tabs-container {
+            background: #e2e8f0;
+            padding: 0 40px;
+            display: flex;
+            gap: 5px;
+            border-bottom: 3px solid #cbd5e0;
+        }
+        
+        .tab-button {
+            background: transparent;
+            border: none;
+            padding: 18px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            top: 3px;
+        }
+        
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: #2d3748;
+        }
+        
+        .tab-button.active {
+            background: #f7fafc;
+            color: #1a365d;
+            border-bottom: 3px solid #2c5282;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
         .filters-section {
             padding: 30px 40px;
             background: #f7fafc;
@@ -134,6 +175,12 @@
             grid-template-columns: 1fr 2fr;
             gap: 20px;
             align-items: end;
+        }
+        
+        .filters-grid-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
         
         .filter-group {
@@ -234,6 +281,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        
+        .profesor-info {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .profesor-nombre {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .profesor-area {
+            font-size: 1.1em;
+            opacity: 0.9;
         }
         
         .evaluador-nombre {
@@ -363,6 +429,16 @@
                 text-align: center;
             }
             
+            .tabs-container {
+                padding: 0 20px;
+                overflow-x: auto;
+            }
+            
+            .tab-button {
+                padding: 15px 20px;
+                font-size: 0.9em;
+            }
+            
             .filters-grid {
                 grid-template-columns: 1fr;
             }
@@ -412,68 +488,266 @@
             </a>
         </div>
         
-        <div class="filters-section">
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label for="tipoEvaluador">
-                        Tipo de Evaluador
-                    </label>
-                    <select id="tipoEvaluador">
-                        <option value="">-- Seleccione tipo --</option>
-                        <option value="academico">Académico ECIEM</option>
-                        <option value="externo">Evaluador Externo</option>
-                    </select>
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="switchTab('evaluador')">
+                👤 Ver como Evaluador
+            </button>
+            <button class="tab-button" onclick="switchTab('profesor')">
+                👨‍🏫 Ver como Profesor Guía
+            </button>
+        </div>
+        
+        <!-- TAB 1: Ver como Evaluador -->
+        <div id="tab-evaluador" class="tab-content active">
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="tipoEvaluador">
+                            Tipo de Evaluador
+                        </label>
+                        <select id="tipoEvaluador">
+                            <option value="">-- Seleccione tipo --</option>
+                            <option value="academico">Académico ECIEM</option>
+                            <option value="externo">Evaluador Externo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="nombreEvaluador">
+                            Seleccionar Evaluador
+                            <span class="count-badge" id="countBadge" style="display: none;"></span>
+                        </label>
+                        <select id="nombreEvaluador" disabled>
+                            <option value="">-- Primero seleccione el tipo --</option>
+                        </select>
+                    </div>
                 </div>
-                
-                <div class="filter-group">
-                    <label for="nombreEvaluador">
-                        Seleccionar Evaluador
-                        <span class="count-badge" id="countBadge" style="display: none;"></span>
-                    </label>
-                    <select id="nombreEvaluador" disabled>
-                        <option value="">-- Primero seleccione el tipo --</option>
-                    </select>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number" id="statTotal">0</div>
+                    <div class="stat-label">Seminarios Asignados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="statEstudiantes">0</div>
+                    <div class="stat-label">Estudiantes Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="statAreas">0</div>
+                    <div class="stat-label">Áreas Temáticas</div>
+                </div>
+            </div>
+            
+            <div class="results-section" id="resultsEvaluador">
+                <div class="no-results">
+                    <div class="no-results-icon">📚</div>
+                    <h3>Seleccione un tipo de evaluador para comenzar</h3>
+                    <p>Use los filtros superiores para ver sus seminarios asignados</p>
                 </div>
             </div>
         </div>
         
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-number" id="statTotal">0</div>
-                <div class="stat-label">Seminarios Asignados</div>
+        <!-- TAB 2: Ver como Profesor Guía -->
+        <div id="tab-profesor" class="tab-content">
+            <div class="filters-section">
+                <div class="filters-grid-single">
+                    <div class="filter-group">
+                        <label for="nombreProfesor">
+                            Seleccionar Profesor Guía
+                            <span class="count-badge" id="countProfesorBadge"></span>
+                        </label>
+                        <select id="nombreProfesor">
+                            <option value="">-- Seleccione un profesor guía --</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number" id="statEstudiantes">0</div>
-                <div class="stat-label">Estudiantes Total</div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number" id="statTotalProfesor">0</div>
+                    <div class="stat-label">Seminarios en su Área</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="statEstudiantesProfesor">0</div>
+                    <div class="stat-label">Estudiantes Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="statEvaluadores">0</div>
+                    <div class="stat-label">Evaluadores Distintos</div>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number" id="statAreas">0</div>
-                <div class="stat-label">Áreas Temáticas</div>
-            </div>
-        </div>
-        
-        <div class="results-section" id="resultsSection">
-            <div class="no-results">
-                <div class="no-results-icon">📚</div>
-                <h3>Seleccione un tipo de evaluador para comenzar</h3>
-                <p>Use los filtros superiores para ver sus seminarios asignados</p>
+            
+            <div class="results-section" id="resultsProfesor">
+                <div class="no-results">
+                    <div class="no-results-icon">📚</div>
+                    <h3>Seleccione un profesor guía</h3>
+                    <p>Use el desplegable superior para ver todos los seminarios de su área</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         // Datos embebidos
-        const SEMINARIOS_DATA = [{"codigo": "ECO1", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "El mercado laboral en la Región de Coquimbo: El rol de la conmutación intrarregional", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=1XjAVHTsahY4Ld3sfpJBNcl7uIAgsYHHE", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "JAVIER MARTÍNEZ*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "FRANCO ALEJANDRO MACAYA FLORES", "email": "franco.macaya@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA YANTIELL EGAÑA CORTES", "email": "valentina.egana01@alumnos.ucn.cl"}]}, {"codigo": "ECO2", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "Fecundidad y cambio demográfico en Chile", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=1dZ2N6fNFmuRUFfoVYY74naTsx9271dsN", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "CAROLINA SALINAS*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "IGNACIA AMAPOLA SANDOVAL CORTES", "email": "ignacia.sandoval@alumnos.ucn.cl"}, {"nombre_completo": "JOSE TOMAS ARCOS GUERRERO", "email": "jose.arcos@alumnos.ucn.cl"}, {"nombre_completo": "MOYRA JAVIERA SOFIA MAUREIRA LOPEZ", "email": "moyra.maureira@alumnos.ucn.cl"}]}, {"codigo": "ECO3", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "Acceso a la vivienda en Chile: análisis de los precios y el endeudamiento de las familias", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=14M4EfyW-bSYv-RF-iwWij-P8TAW-KJVB", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "MARCELO OLIVARES*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CATALINA BELEN PINILLA PASTEN", "email": "catalina.pinilla@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA BELEN MUÑOZ JAIME", "email": "constanza.munoz@alumnos.ucn.cl"}, {"nombre_completo": "SEBASTIAN ALEJANDRO CARVAJAL ROJAS", "email": "sebastian.carvajal04@alumnos.ucn.cl"}]}, {"codigo": "ECO4", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "El rol de la digitalización en la transformación de los mercados financieros", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=1rZhTeYPSMew6NvPAoAGo_aETYOa1FY35", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "PENDIENTE*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "FRANCISCA ROCIO BALANDA CORCO", "email": "francisca.balanda@alumnos.ucn.cl"}, {"nombre_completo": "RADHARANI AURORA MEZA ARAYA", "email": "radharani.meza@alumnos.ucn.cl"}, {"nombre_completo": "SKIBIRAM DE LA CRUZ BRICEÑO FARIAS", "email": "skibiram.briceno@alumnos.ucn.cl"}]}, {"codigo": "EMP1", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "USQAI  Programa Nomada", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1oiNbUS29veaM-aVOAWllZvDPmh8aZJix", "evaluador1": "TOMÁS BAS", "evaluador2": "MARÍA FERNANDA ROCO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "GONZALO ANDRES OSSANDON OLIVA", "email": "gonzalo.ossandon01@alumnos.ucn.cl"}, {"nombre_completo": "JAVIERA FRANCISCA CASTILLO CORTES", "email": "javiera.castillo05@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA JAVIERA ORDENES IBAÑEZ", "email": "valentina.ordenes01@alumnos.ucn.cl"}]}, {"codigo": "EMP2", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Intención Emprendedora", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1jKB4PQfYwCeR8kdmE5codm3w-hiDVIoX", "evaluador1": "TOMÁS BAS", "evaluador2": "GIANNI ROMANI*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "FERNANDA MACARENA ARAYA MUNDACA", "email": "fernanda.araya01@alumnos.ucn.cl"}, {"nombre_completo": "ROBERTO ANTONIO AGUIRRE ROJAS", "email": "roberto.aguirre@alumnos.ucn.cl"}]}, {"codigo": "EMP3", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Modelo de Negocio Restaurantes Av. Del Mar", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1LyLLhS938r0OyaK-8ccGL1eUMI2jtutN", "evaluador1": "TOMÁS BAS", "evaluador2": "MARIA ANTONIETA ZUÑIGA*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DANIELA VICTORIA ORTIZ LAMAS", "email": "daniela.ortiz@alumnos.ucn.cl"}, {"nombre_completo": "MABEL SOLEDAD PEREZ LEYTON", "email": "mabel.perez@alumnos.ucn.cl"}]}, {"codigo": "EMP4", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Triple Impacto Cabañas Paihuano", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=109r7sNd8WwTBwwIJIVoSMYnX9V9ysJ0u", "evaluador1": "TOMÁS BAS", "evaluador2": "IRMA ÁVALOS*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "IGNACIO ALEJANDRO GARCIA NUÑEZ", "email": "ignacio.garcia01@alumnos.ucn.cl"}, {"nombre_completo": "MATIAS ALEXANDER ESPEJO GONZALEZ", "email": "matias.espejo@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA NAYELY ROJAS CIFUENTES", "email": "constanza.rojas06@alumnos.ucn.cl"}]}, {"codigo": "EMP5", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Turismo Wellness en Tongoy", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1DfXDbjUJDzgPzASoa9vu09JH0CmhL-o1", "evaluador1": "CARLA ANDRADE", "evaluador2": "ALBERTO ROJAS*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DAVID ANDRES PEZO AQUEDA", "email": "david.pezo@alumnos.ucn.cl"}, {"nombre_completo": "LILIBETH NOEMY AURORA BALDONADO ALVARADO", "email": "lilibeth.baldonado@alumnos.ucn.cl"}]}, {"codigo": "FIN1", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "Parque de entretenciones extremas ", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1zhrjEid7WVtjnilC7CAokQHLj-qH0mYB", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "AIVORY BELEN SEPULVEDA GARAY", "email": "aivory.sepulveda@alumnos.ucn.cl"}, {"nombre_completo": "ANTONIA AYELEN HERNANDEZ CONTRERAS", "email": "antonia.hernandez@alumnos.ucn.cl"}, {"nombre_completo": "BASTIAN ANTONIO GARRIDO GONZALEZ", "email": "bastian.venegas@alumnos.ucn.cl"}]}, {"codigo": "FIN2", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "Hotel Mascotas", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1uldYolBeFzgLiP_3Ts6xsh-cIH8V_XcF", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "BASTIAN ALEJANDRO VENEGAS CASTILLO", "email": "bastian.garrido@alumnos.ucn.cl"}, {"nombre_completo": "ELIAS MAXIMILIANO LAMAS YARYES", "email": "elias.lamas@alumnos.ucn.cl"}]}, {"codigo": "FIN3", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "CMI- Carrera Ing. Comercial", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1a_0SzupKKY2S52ELKON0JJRRJw7OrBgF", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CAMILO ANDRES TABILO LOPEZ", "email": "camilo.tabilo@alumnos.ucn.cl"}, {"nombre_completo": "NALLELY ALEJANDRA PAREDES APABLAZA", "email": "nallely.paredes@alumnos.ucn.cl"}]}, {"codigo": "FIN4", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "CMI . ECIEM", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1dGPxTAvbcVhvrfPxntJOqlf2YeVX_RLJ", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "JAVIERA IGNACIA RIVERA VALDIVIA", "email": "javiera.rivera06@alumnos.ucn.cl"}, {"nombre_completo": "JUAN ALBERTO OLIVARES LAGUNAS", "email": "juan.olivares@alumnos.ucn.cl"}, {"nombre_completo": "MARTIN IGNACIO BARRA ALVAREZ", "email": "martin.barra@alumnos.ucn.cl"}]}, {"codigo": "GES1", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Gestión de proveedores locales de Trabajos en Talleres Ajenos en Finning CAT Sucursal Coquimbo. ", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1UjBbiY68HH8ihhq_gsVTjCpmujirWyyN", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "CRISTIAN MORALES", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FELIPE ISRAEL POBLETE DUBO", "email": "felipe.poblete@alumnos.ucn.cl"}, {"nombre_completo": "FLORENCIA VALENTINA VENEGAS BURGOS", "email": "florencia.venegas@alumnos.ucn.cl"}, {"nombre_completo": "SOL MELIA PAZ ILLANES VEGA", "email": "sol.illanes@alumnos.ucn.cl"}]}, {"codigo": "GES2", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Intraemprendimiento para la adopción de prácticas sustentables en el sector de la construcción. Región de Coquimbo", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1JgGlcCD2ctLUHt3NiShRi5BK3Qaq0xek", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "CRISTIAN MORALES", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FELIPE IGNACIO BUSTAMANTE BUSTAMANTE", "email": "felipe.bustamante01@alumnos.ucn.cl"}, {"nombre_completo": "FLORENCIA JESUS ARANGUIZ ALFARO", "email": "florencia.aranguiz@alumnos.ucn.cl"}, {"nombre_completo": "IGNACIO ALEJANDRO COROSEO ARQUEROS", "email": "ignacio.coroseo@alumnos.ucn.cl"}]}, {"codigo": "GES3", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Cuadro de Mando Integral Sostenible para PREOMED", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1X6I5BbaAPOSAbKjUwwRFGKjhpgVMw1Y0", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "GIAN FRANCO MAXIMILIAM AGUILAR GUERRERO", "email": "gian.aguilar@alumnos.ucn.cl"}, {"nombre_completo": "PAOLA VALENTINA AGUIRRE HERNANDEZ", "email": "paola.aguirre@alumnos.ucn.cl"}]}, {"codigo": "GES4", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Laboratorio Natural y Turismo Científico", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1NhPH2qjWWZs45Dr-cUgWnTwL-ZuJajtQ", "evaluador1": "CRISTIAN MORALES", "evaluador2": "MARCELO OLIVARES*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CRISTOBAL ANTUAN JIMENEZ PASTEN", "email": "cristobal.jimenez@alumnos.ucn.cl"}, {"nombre_completo": "JOAQUIN ENRIQUE OLIVO ALEGRIA", "email": "joaquin.olivo@alumnos.ucn.cl"}, {"nombre_completo": "NINA-MAARIT  OSSANDON HOSTENS", "email": "ninamaarit.ossandon@alumnos.ucn.cl"}]}, {"codigo": "INN1", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“PERCEPCIÓN DE INSEGURIDAD EN TRASLADOS URBANOS DESDE Y HACIA LA UNIVERSIDAD CATÓLICA DEL NORTE (COQUIMBO): FACTORES RESPONSABLES,", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1xMB2f8jxF1lrxrKDZf095EPC2kYZOn2s", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CATALINA ALMEDRA ANAHYS PALMUCCI MARIN", "email": "catalina.palmucci@alumnos.ucn.cl"}, {"nombre_completo": "DANIELA IGNACIA VEGA DURAN", "email": "daniela.vega02@alumnos.ucn.cl"}, {"nombre_completo": "GLADYS ALEJANDRA ROMO CASTILLO", "email": "gladys.romo@alumnos.ucn.cl"}]}, {"codigo": "INN2", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“Análisis de Sistema de Alerta Temprana ante Riesgo de Ataque Cardíaco en Conductores de Vehículos Basado en Tecnología Sensorial Aplicada al Volante”", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1mN2NV0Cgz5PJHcPJAIUqRXFOuebjm3pe", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CATALINA ALINE VEGA LEON", "email": "catalina.vega02@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA YUYUNIZ VEGA RIVES", "email": "constanza.vega01@alumnos.ucn.cl"}, {"nombre_completo": "DAYANA DENISSE RODRIGUEZ ARREDONDO", "email": "dayana.rodriguez@alumnos.ucn.cl"}]}, {"codigo": "INN3", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“El uso de drones aplicado a la agricultura de precisión para áreas con grandes dificultades de acceso de maquinaria tradicional, buscando mejorar la eficiencia", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1POx-s8QXkFhFbeoSsq8AoalJwlSjWvgb", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "DAVID ANTONIO BUGUEÑO BUGUEÑO", "email": "david.bugueno@alumnos.ucn.cl"}, {"nombre_completo": "MARION FRANCISCA ALFARO DELGADO", "email": "marion.alfaro@alumnos.ucn.cl"}, {"nombre_completo": "YEIMMY ALEJANDRA ANTONIET CASTRO ROJAS", "email": "yeimmy.castro@alumnos.ucn.cl"}]}, {"codigo": "INN4", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“Uso de Residuos de Conchas de Ostión para la Producción de Cal Viva Impactando Positivamente en la Reducción de Residuos Orgánicos en el Vertedero Municipal de", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=18elpmanVKcvA0WVKdkckkmJfLiHfObIK", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "JOSIP GORAN PAPIC PINO", "email": "josip.papic@alumnos.ucn.cl"}, {"nombre_completo": "MARION FRANCISCA MARTINEZ LEYTON", "email": "marion.martinez@alumnos.ucn.cl"}, {"nombre_completo": "ORNELA JANETT PASTEN GONZALEZ", "email": "ornela.pasten@alumnos.ucn.cl"}]}, {"codigo": "INN5", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“MITIGACIÓN DE OLORES MOLESTOS EN LA COMUNIDAD UNIVERSITARIA UCN Y SU ENTORNO: PROPUESTA INNOVADORA PARA LA", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1gMIRkVxVZ-C7uVM9kVU4VM_wQ4UKssLh", "evaluador1": "KAREN VARGAS", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "STELLA FRANCISCA CASANGA LOPEZ", "email": "stella.casanga@alumnos.ucn.cl"}, {"nombre_completo": "THOMAS PATRICIO CADENA ROJAS", "email": "thomas.cadena@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA MONSERRATT ARANCIBIA CELIS", "email": "valentina.arancibia01@alumnos.ucn.cl"}]}, {"codigo": "PES1", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Moda Tras Pandemia", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1vgxtEOB3VUJGlKAF77J9f2idyZnxIlhr", "evaluador1": "OSWALDO TERÁN", "evaluador2": "RODRIGO FLORES GUERRERO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "JANIS ALEXANDRA VARGAS LILLO", "email": "janis.vargas@alumnos.ucn.cl"}, {"nombre_completo": "MONICA YULITZA CORTES RENTERIA", "email": "monica.cortes@alumnos.ucn.cl"}, {"nombre_completo": "VALERIA ANAIS GUERRA ARACENA", "email": "valeria.barraza01@alumnos.ucn.cl"}]}, {"codigo": "PES2", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Deserción Pymes", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1-WEu-KmrwVjO7xnHDLSqXp8KPuqhQ10r", "evaluador1": "OSWALDO TERÁN", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ALEXANDRA BELEN LATUZ PIÑONES", "email": "alexandra.latuz@alumnos.ucn.cl"}, {"nombre_completo": "BELEN  CERDA CORTES", "email": "belen.cerda@alumnos.ucn.cl"}, {"nombre_completo": "FRANCISCO GUSTAVO MARIN MAGALLANES", "email": "francisco.marin01@alumnos.ucn.cl"}]}, {"codigo": "PES3", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Planificacion Estratégica San Francisco", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1epuzqgSKAflHvxCAksEHPQJ9TV6et1Vx", "evaluador1": "OSWALDO TERÁN", "evaluador2": "VICTOR PIZARRO ARAYA*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DANIELA ARACELY ORREGO CONTRERAS", "email": "daniela.orrego@alumnos.ucn.cl"}, {"nombre_completo": "KRISHNA CATALINA CONTRERAS SANTANDER", "email": "krishna.contreras02@alumnos.ucn.cl"}, {"nombre_completo": "PATRICIO IGNACIO FABRES NUÑEZ", "email": "patricio.fabres@alumnos.ucn.cl"}]}, {"codigo": "PES4", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Inteligencia Artificial en UCN", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1TIrTiCLBB8XwYNLIhZ8oDZ37Zkz_iilj", "evaluador1": "OSWALDO TERÁN", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ANAYELLY ANDREA EGAÑA SANTANDER", "email": "anayelly.egana@alumnos.ucn.cl"}, {"nombre_completo": "JORDAN NIBALDO VILLALOBOS CABRERA", "email": "jordan.villalobos@alumnos.ucn.cl"}, {"nombre_completo": "MAXIMILIANO ALFONSO ROJAS VILLALOBOS", "email": "maximiliano.rojas04@alumnos.ucn.cl"}]}, {"codigo": "PES5", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Plan Estratégico Empresa Century", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1rSGQB02bUvMbhVS8vWaNEp9YH522HM3g", "evaluador1": "OSWALDO TERÁN", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FIORELLA ISABEL ARAYA PARRA", "email": "fiorella.araya@alumnos.ucn.cl"}, {"nombre_completo": "JOAQUIN IGNACIO INOSTROZA SEGOVIA", "email": "joaquin.inostroza@alumnos.ucn.cl"}, {"nombre_completo": "VALERIA CAROLINA BARRAZA TAPIA", "email": "valeria.guerra@alumnos.ucn.cl"}]}, {"codigo": "DBD1", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Impacto de la actividad física y la exigencia académica en el rendimiento académico y bienestar de los estudiantes universitarios", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1D8JfNt2QyGO2g2HT0MmkoDzrkU5ENlab", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "BORIS BUGUEÑO", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "MARIO ESTEBAN CASTILLO BUSTOS", "email": "mario.castillo01@alumnos.ucn.cl"}, {"nombre_completo": "PEDRO ABSALON ANTONIO RAMOS VILLAGRA", "email": "pedro.ramos@alumnos.ucn.cl"}]}, {"codigo": "DBD2", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Sistema basado aprendizaje automático  para apoyar la gestión de servicios de seguridad en lugares públicos de Chile", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1umfXbfWsT0SnfNg92V9SrmV-A3W5x9eK", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "BORIS BUGUEÑO", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "DAVID ANTONIO CORTES JOVE", "email": "david.cortes@alumnos.ucn.cl"}, {"nombre_completo": "JOSE VICENTE CORDERO BREVIS", "email": "jose.cordero@alumnos.ucn.cl"}, {"nombre_completo": "MICHELL ANTOIS VEGA IBACETA", "email": "michell.rossel@alumnos.ucn.cl"}]}, {"codigo": "DBD3", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Diseño de un plan de Control de Gestión para Perfomin Mina La Niña", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1SosG1ygnJgpzlPh6dk_sFlubNb2WH4in", "evaluador1": "VANNESSA DUARTE", "evaluador2": "CATALINA VARELA TORREJÓN*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "KARLA VALERIA CAIMANQUE RODRIGUEZ", "email": "karla.caimanque@alumnos.ucn.cl"}, {"nombre_completo": "ROCIO JOSEFA RIVERA BONILLA", "email": "rocio.rivera02@alumnos.ucn.cl"}]}, {"codigo": "DBD4", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Clasificación y evaluación de rutas críticas del sistema aéreo nacional chileno mediante análisis de redes: un enfoque desde grandes volúmenes de datos logístico y ambiental", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1_oyxJWHTb1vR8N_tHJJm7Fnp88M3W2DS", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "VANNESSA DUARTE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ANGIE LIZBETH DE LA TORRE MALDONADO", "email": "angie.delatorre@alumnos.ucn.cl"}, {"nombre_completo": "MICHEL ANNAIS APPELGREN GONZALEZ", "email": "michel.appelgren@alumnos.ucn.cl"}, {"nombre_completo": "VIVI-ANN MARGARITA FLORES MARTINEZ", "email": "viviann.flores@alumnos.ucn.cl"}]}, {"codigo": "DBD5", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Análisis de los macrodatos en la gestión de personas en el sector público educativo", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=13GYJK_wp_CIIPTMROJ8dHgn5mlOCoCfn", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "VANNESSA DUARTE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "PATRICIO ANDRES VILCHES TOLEDO", "email": "patricio.vilches@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA AYALEN FERNANDEZ HIDALGO", "email": "valentina.fernandez01@alumnos.ucn.cl"}]}, {"codigo": "DBD6", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Factores claves en el desempeño académico: Un enfoque basado en estudios y análisis de datos", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1OV6W-xoK-3yiRxmnPgT71s3slt4nyCfB", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "VANNESSA DUARTE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ARIEL MAURICIO VARGAS MONTECINOS", "email": "ariel.vargas@alumnos.ucn.cl"}, {"nombre_completo": "KRISHNA FERNANDA SOTO PEREZ", "email": "krishna.soto@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA JAVIERA BELEN LAFFERTE GUTIERREZ", "email": "valentina.lafferte@alumnos.ucn.cl"}]}, {"codigo": "SIA1", "area": "[SIA (Dra. Vannessa Duarte)]", "titulo": "sistema, gestión logística y clientes, aguas Paitanas", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1lZkCTc-LXnahpe5roqSavlL-yqdvv9tQ", "evaluador1": "NATALIA ARAYA", "evaluador2": "CARLOS VERGARA*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "BELEN MARLENY GOMEZ PARRA", "email": "belen.gomez@alumnos.ucn.cl"}, {"nombre_completo": "CAROLINA ALEJANDRA CARVAJAL RIVAS", "email": "carolina.carvajal02@alumnos.ucn.cl"}]}, {"codigo": "SIA2", "area": "[SIA (Dra. Vannessa Duarte)]", "titulo": "sistemas, trazabilidad y asistencia, campeones para Coquimbo", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1b4fMUyZYe4SgvL4iUTr3X5Bbq8erzgz4", "evaluador1": "NATALIA ARAYA", "evaluador2": "CLAUDIO MUÑOZ*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CAROLINA ALEJANDRA OPAZO ROJAS", "email": "carolinaopazo.r6@gmail.com"}, {"nombre_completo": "CATALINA ANAIS ORDENES OLMOS", "email": "catalina.ordenes@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA MARIA DE LOS AN ALVAREZ BARRAZA", "email": "constanza.alvarez03@alumnos.ucn.cl"}]}, {"codigo": "SIA3", "area": "[SIA (Dra. Vannessa Duarte)]", "titulo": "sistema, reportes de emergencia, bomberos Coquimbo", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1D8DmlS1-OyvVZGH3qz4d3rzwkkK0KbXs", "evaluador1": "BORIS BUGUEÑO", "evaluador2": "JUAN COLLAO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "IGNACIA VALENTINA PETIT PINTO", "email": "ignacia.petit@alumnos.ucn.cl"}, {"nombre_completo": "LORENA ANDREA NAVARRO BARRAZA", "email": "lorena.navarro@alumnos.ucn.cl"}, {"nombre_completo": "RENATO ALBERTO VARGAS PACHECO", "email": "renato.vargas@alumnos.ucn.cl"}]}, {"codigo": "INT1", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "modelo integración datos, reclutamiento, Codelco", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1kFolrW85LMomt1Jre9LQa4hiVX_yxWT_", "evaluador1": "SOFÍA ORAZI", "evaluador2": "PATRICIA CASTILLO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DANIEL ALEJANDRO CARDENAS VILLAR", "email": "ahpdaniel98@gmail.com"}, {"nombre_completo": "NICOLAS GASTON PEFAUR YAPUR", "email": "nicolas.pefaur@alumnos.ucn.cl"}]}, {"codigo": "INT2", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "integración de datos, proceso embalaje, RioBlanco", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1FTLyOx1PrSRvZozzyb2WVmuZPPD85KLC", "evaluador1": "SOFÍA ORAZI", "evaluador2": "CRISTIAN RECKAMM*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CATALINA JOSE SANTANDER ULLOA", "email": "catalina.santander01@alumnos.ucn.cl"}, {"nombre_completo": "NICOLY QUINTINO DE OLIVEIRA", "email": "nicoly.quintino@alumnos.ucn.cl"}, {"nombre_completo": "NILISE YULIETTE LEON CONCHA", "email": "nilise.leon@alumnos.ucn.cl"}]}, {"codigo": "INT3", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "integracón de datos VCM ECIEM", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1APMGWY2aXReRlG7_peKNUncB6p9Zpubk", "evaluador1": "SOFÍA ORAZI", "evaluador2": "CRISTIAN MORALES", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FRANCO JOSE EMANUEL LIZARDI CUELLO", "email": "franco.lizardi@alumnos.ucn.cl"}, {"nombre_completo": "NAYELI FELICIANA GOMEZ SEVERINO", "email": "nayeli.gomez@alumnos.ucn.cl"}]}, {"codigo": "INT4", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "integración de datos financieros y de operaciones del canal Bellavista", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1owKfrpfIwgGqtfM9ul--HseSX255vdq8", "evaluador1": "SOFÍA ORAZI", "evaluador2": "MANUEL DOMÍNGUEZ*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "NICOLAS BACHELET TELLO", "email": "nicolas.bachelet@alumnos.ucn.cl"}, {"nombre_completo": "SOFIA BELEN AGUILERA GUERRERO", "email": "sofia.aguilera@alumnos.ucn.cl"}]}, {"codigo": "PCG1", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Trabajo decente y calidad educativa en escuelas públicas de la región de Coquimbo post pandemia", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=16gO-QZ-kxmDzWO5OMoTYWYm8ZIotqB78", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CONSTANZA ALEJANDRA CABRERA CARRASCO", "email": "constanza.cabrera@alumnos.ucn.cl"}, {"nombre_completo": "FRANK MICHELL SALDIBAR GONZALEZ", "email": "frank.saldibar@alumnos.ucn.cl"}]}, {"codigo": "PCG2", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Salario emocional y su influencia en el compromiso laboral de docentes de educación superior", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1GxMlydNOZJrZJYQ-eW6MJcHXNM5Raney", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "KIMBERLY ANDREA MADRIAGA BOLBARAN", "email": "kimberly.madriaga@alumnos.ucn.cl"}, {"nombre_completo": "ROSARIO PAZ BENAVIDES FLORES", "email": "rosario.benavides@alumnos.ucn.cl"}]}, {"codigo": "PCG3", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Estrategias de Economía Circular para la Gestión de Residuos sólidos en Microempresas de Construcción en Chile", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1RnYhK7FTmz0Ox3v2wooilaSKBtfrN-tl", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ELIZABETH ROCIO BOLADOS ROJAS", "email": "elizabeth.bolados@alumnos.ucn.cl"}, {"nombre_completo": "FERNANDA INES CORTES ARAYA", "email": "fernanda.cortes@alumnos.ucn.cl"}, {"nombre_completo": "NICOLAS ARMANDO ROSALES CARMONA", "email": "nicolas.rosales@alumnos.ucn.cl"}]}, {"codigo": "PCG4", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Plan estratégico para mejorar la competitividad y sustentabilidad en temporada baja en el Aparthotel Marsella de Bahía Inglesa.", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1KBQeKrKiiB4DUHqx28f4ZNe9F4yf0j_9", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "DAFNE MACARENA ARENAS NAVEA", "email": "dafne.arenas@alumnos.ucn.cl"}, {"nombre_completo": "LAURA ALEJANDRA ZEBALLOS CARVAJAL", "email": "laura.zeballos@alumnos.ucn.cl"}, {"nombre_completo": "MACARENA PATRICIA BAQUEDANO FIGUEROA", "email": "macarena.baquedano@alumnos.ucn.cl"}]}, {"codigo": "PCG5", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Diseño de modelo de control de gestión para evaluar la efectividad del apoyo empresarial de CORFO en Coquimbo desde el 2022  al 2024", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1w93PU-zhR4qTPFgyGokiVM9ssnHtTNx5", "evaluador1": "KAREN VARGAS", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ANA VALENTINA CONTRERAS PEREZ", "email": "ana.contreras@alumnos.ucn.cl"}, {"nombre_completo": "CAMILA MAKARENA SARMIENTO ARAYA", "email": "camila.sarmiento@alumnos.ucn.cl"}, {"nombre_completo": "MONSERRAT ISIDORA ABDALA OLIVEROS", "email": "monserrat.abdala@alumnos.ucn.cl"}]}, {"codigo": "PCG6", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Propuesta de planificación estratégica basada en la norma ISO9001:2015 para la empresa ferretera y gases industriales Cevin S.A", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1RUrGJDMP3Qfc9anJAkz81OxL5_qlMXAx", "evaluador1": "KAREN VARGAS", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CAMILO IGNACIO TAPIA SANTANDER", "email": "camilo.tapia01@alumnos.ucn.cl"}, {"nombre_completo": "MARTIN ANDRES IDUYA TAPIA", "email": "martin.iduya@alumnos.ucn.cl"}]}];
+        const SEMINARIOS_DATA = [{"codigo": "ECO1", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "El mercado laboral en la Región de Coquimbo: El rol de la conmutación intrarregional", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=1XjAVHTsahY4Ld3sfpJBNcl7uIAgsYHHE", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "JAVIER MARTÍNEZ*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "FRANCO ALEJANDRO MACAYA FLORES", "email": "franco.macaya@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA YANTIELL EGAÑA CORTES", "email": "valentina.egana01@alumnos.ucn.cl"}]}, {"codigo": "ECO2", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "Fecundidad y cambio demográfico en Chile", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=1dZ2N6fNFmuRUFfoVYY74naTsx9271dsN", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "CAROLINA SALINAS*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "IGNACIA AMAPOLA SANDOVAL CORTES", "email": "ignacia.sandoval@alumnos.ucn.cl"}, {"nombre_completo": "JOSE TOMAS ARCOS GUERRERO", "email": "jose.arcos@alumnos.ucn.cl"}, {"nombre_completo": "MOYRA JAVIERA SOFIA MAUREIRA LOPEZ", "email": "moyra.maureira@alumnos.ucn.cl"}]}, {"codigo": "ECO3", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "Acceso a la vivienda en Chile: análisis de los precios y el endeudamiento de las familias", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=14M4EfyW-bSYv-RF-iwWij-P8TAW-KJVB", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "MARCELO OLIVARES*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CATALINA BELEN PINILLA PASTEN", "email": "catalina.pinilla@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA BELEN MUÑOZ JAIME", "email": "constanza.munoz@alumnos.ucn.cl"}, {"nombre_completo": "SEBASTIAN ALEJANDRO CARVAJAL ROJAS", "email": "sebastian.carvajal04@alumnos.ucn.cl"}]}, {"codigo": "ECO4", "area": "[Economía (Dra. Sofía Orazi)]", "titulo": "El rol de la digitalización en la transformación de los mercados financieros", "profesor_guia": "SOFÍA ORAZI", "link_informe": "https://drive.google.com/open?id=1rZhTeYPSMew6NvPAoAGo_aETYOa1FY35", "evaluador1": "MAURICIO GALLARDO", "evaluador2": "PENDIENTE*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "FRANCISCA ROCIO BALANDA CORCO", "email": "francisca.balanda@alumnos.ucn.cl"}, {"nombre_completo": "RADHARANI AURORA MEZA ARAYA", "email": "radharani.meza@alumnos.ucn.cl"}, {"nombre_completo": "SKIBIRAM DE LA CRUZ BRICEÑO FARIAS", "email": "skibiram.briceno@alumnos.ucn.cl"}]}, {"codigo": "EMP1", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "USQAI  Programa Nomada", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1oiNbUS29veaM-aVOAWllZvDPmh8aZJix", "evaluador1": "TOMÁS BAS", "evaluador2": "MARÍA FERNANDA ROCO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "GONZALO ANDRES OSSANDON OLIVA", "email": "gonzalo.ossandon01@alumnos.ucn.cl"}, {"nombre_completo": "JAVIERA FRANCISCA CASTILLO CORTES", "email": "javiera.castillo05@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA JAVIERA ORDENES IBAÑEZ", "email": "valentina.ordenes01@alumnos.ucn.cl"}]}, {"codigo": "EMP2", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Intención Emprendedora", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1jKB4PQfYwCeR8kdmE5codm3w-hiDVIoX", "evaluador1": "TOMÁS BAS", "evaluador2": "GIANNI ROMANI*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "FERNANDA MACARENA ARAYA MUNDACA", "email": "fernanda.araya01@alumnos.ucn.cl"}, {"nombre_completo": "ROBERTO ANTONIO AGUIRRE ROJAS", "email": "roberto.aguirre@alumnos.ucn.cl"}]}, {"codigo": "EMP3", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Modelo de Negocio Restaurantes Av. Del Mar", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1LyLLhS938r0OyaK-8ccGL1eUMI2jtutN", "evaluador1": "TOMÁS BAS", "evaluador2": "MARIA ANTONIETA ZUÑIGA*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DANIELA VICTORIA ORTIZ LAMAS", "email": "daniela.ortiz@alumnos.ucn.cl"}, {"nombre_completo": "MABEL SOLEDAD PEREZ LEYTON", "email": "mabel.perez@alumnos.ucn.cl"}]}, {"codigo": "EMP4", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Triple Impacto Cabañas Paihuano", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=109r7sNd8WwTBwwIJIVoSMYnX9V9ysJ0u", "evaluador1": "TOMÁS BAS", "evaluador2": "IRMA ÁVALOS*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "IGNACIO ALEJANDRO GARCIA NUÑEZ", "email": "ignacio.garcia01@alumnos.ucn.cl"}, {"nombre_completo": "MATIAS ALEXANDER ESPEJO GONZALEZ", "email": "matias.espejo@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA NAYELY ROJAS CIFUENTES", "email": "constanza.rojas06@alumnos.ucn.cl"}]}, {"codigo": "EMP5", "area": "[Emprendimiento (Dra. Karla Soria)]", "titulo": "Turismo Wellness en Tongoy", "profesor_guia": "KARLA SORIA", "link_informe": "https://drive.google.com/open?id=1DfXDbjUJDzgPzASoa9vu09JH0CmhL-o1", "evaluador1": "CARLA ANDRADE", "evaluador2": "ALBERTO ROJAS*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DAVID ANDRES PEZO AQUEDA", "email": "david.pezo@alumnos.ucn.cl"}, {"nombre_completo": "LILIBETH NOEMY AURORA BALDONADO ALVARADO", "email": "lilibeth.baldonado@alumnos.ucn.cl"}]}, {"codigo": "FIN1", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "Parque de entretenciones extremas ", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1zhrjEid7WVtjnilC7CAokQHLj-qH0mYB", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "AIVORY BELEN SEPULVEDA GARAY", "email": "aivory.sepulveda@alumnos.ucn.cl"}, {"nombre_completo": "ANTONIA AYELEN HERNANDEZ CONTRERAS", "email": "antonia.hernandez@alumnos.ucn.cl"}, {"nombre_completo": "BASTIAN ANTONIO GARRIDO GONZALEZ", "email": "bastian.venegas@alumnos.ucn.cl"}]}, {"codigo": "FIN2", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "Hotel Mascotas", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1uldYolBeFzgLiP_3Ts6xsh-cIH8V_XcF", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "BASTIAN ALEJANDRO VENEGAS CASTILLO", "email": "bastian.garrido@alumnos.ucn.cl"}, {"nombre_completo": "ELIAS MAXIMILIANO LAMAS YARYES", "email": "elias.lamas@alumnos.ucn.cl"}]}, {"codigo": "FIN3", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "CMI- Carrera Ing. Comercial", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1a_0SzupKKY2S52ELKON0JJRRJw7OrBgF", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CAMILO ANDRES TABILO LOPEZ", "email": "camilo.tabilo@alumnos.ucn.cl"}, {"nombre_completo": "NALLELY ALEJANDRA PAREDES APABLAZA", "email": "nallely.paredes@alumnos.ucn.cl"}]}, {"codigo": "FIN4", "area": "[Finanzas (Dr. Sergio Zúñiga)]", "titulo": "CMI . ECIEM", "profesor_guia": "SERGIO ZUÑIGA", "link_informe": "https://drive.google.com/open?id=1dGPxTAvbcVhvrfPxntJOqlf2YeVX_RLJ", "evaluador1": "ERICK DE LA BARRA", "evaluador2": "PABLO RODRÍGUEZ", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "JAVIERA IGNACIA RIVERA VALDIVIA", "email": "javiera.rivera06@alumnos.ucn.cl"}, {"nombre_completo": "JUAN ALBERTO OLIVARES LAGUNAS", "email": "juan.olivares@alumnos.ucn.cl"}, {"nombre_completo": "MARTIN IGNACIO BARRA ALVAREZ", "email": "martin.barra@alumnos.ucn.cl"}]}, {"codigo": "GES1", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Gestión de proveedores locales de Trabajos en Talleres Ajenos en Finning CAT Sucursal Coquimbo. ", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1UjBbiY68HH8ihhq_gsVTjCpmujirWyyN", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "CRISTIAN MORALES", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FELIPE ISRAEL POBLETE DUBO", "email": "felipe.poblete@alumnos.ucn.cl"}, {"nombre_completo": "FLORENCIA VALENTINA VENEGAS BURGOS", "email": "florencia.venegas@alumnos.ucn.cl"}, {"nombre_completo": "SOL MELIA PAZ ILLANES VEGA", "email": "sol.illanes@alumnos.ucn.cl"}]}, {"codigo": "GES2", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Intraemprendimiento para la adopción de prácticas sustentables en el sector de la construcción. Región de Coquimbo", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1JgGlcCD2ctLUHt3NiShRi5BK3Qaq0xek", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "CRISTIAN MORALES", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FELIPE IGNACIO BUSTAMANTE BUSTAMANTE", "email": "felipe.bustamante01@alumnos.ucn.cl"}, {"nombre_completo": "FLORENCIA JESUS ARANGUIZ ALFARO", "email": "florencia.aranguiz@alumnos.ucn.cl"}, {"nombre_completo": "IGNACIO ALEJANDRO COROSEO ARQUEROS", "email": "ignacio.coroseo@alumnos.ucn.cl"}]}, {"codigo": "GES3", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Cuadro de Mando Integral Sostenible para PREOMED", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1X6I5BbaAPOSAbKjUwwRFGKjhpgVMw1Y0", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "GIAN FRANCO MAXIMILIAM AGUILAR GUERRERO", "email": "gian.aguilar@alumnos.ucn.cl"}, {"nombre_completo": "PAOLA VALENTINA AGUIRRE HERNANDEZ", "email": "paola.aguirre@alumnos.ucn.cl"}]}, {"codigo": "GES4", "area": "[Gestión y Estrategias (Dra. Karen Vargas)]", "titulo": "Laboratorio Natural y Turismo Científico", "profesor_guia": "KAREN VARGAS", "link_informe": "https://drive.google.com/open?id=1NhPH2qjWWZs45Dr-cUgWnTwL-ZuJajtQ", "evaluador1": "CRISTIAN MORALES", "evaluador2": "MARCELO OLIVARES*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CRISTOBAL ANTUAN JIMENEZ PASTEN", "email": "cristobal.jimenez@alumnos.ucn.cl"}, {"nombre_completo": "JOAQUIN ENRIQUE OLIVO ALEGRIA", "email": "joaquin.olivo@alumnos.ucn.cl"}, {"nombre_completo": "NINA-MAARIT  OSSANDON HOSTENS", "email": "ninamaarit.ossandon@alumnos.ucn.cl"}]}, {"codigo": "INN1", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“PERCEPCIÓN DE INSEGURIDAD EN TRASLADOS URBANOS DESDE Y HACIA LA UNIVERSIDAD CATÓLICA DEL NORTE (COQUIMBO): FACTORES RESPONSABLES,", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1xMB2f8jxF1lrxrKDZf095EPC2kYZOn2s", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CATALINA ALMEDRA ANAHYS PALMUCCI MARIN", "email": "catalina.palmucci@alumnos.ucn.cl"}, {"nombre_completo": "DANIELA IGNACIA VEGA DURAN", "email": "daniela.vega02@alumnos.ucn.cl"}, {"nombre_completo": "GLADYS ALEJANDRA ROMO CASTILLO", "email": "gladys.romo@alumnos.ucn.cl"}]}, {"codigo": "INN2", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“Análisis de Sistema de Alerta Temprana ante Riesgo de Ataque Cardíaco en Conductores de Vehículos Basado en Tecnología Sensorial Aplicada al Volante”", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1mN2NV0Cgz5PJHcPJAIUqRXFOuebjm3pe", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CATALINA ALINE VEGA LEON", "email": "catalina.vega02@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA YUYUNIZ VEGA RIVES", "email": "constanza.vega01@alumnos.ucn.cl"}, {"nombre_completo": "DAYANA DENISSE RODRIGUEZ ARREDONDO", "email": "dayana.rodriguez@alumnos.ucn.cl"}]}, {"codigo": "INN3", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“El uso de drones aplicado a la agricultura de precisión para áreas con grandes dificultades de acceso de maquinaria tradicional, buscando mejorar la eficiencia", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1POx-s8QXkFhFbeoSsq8AoalJwlSjWvgb", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "DAVID ANTONIO BUGUEÑO BUGUEÑO", "email": "david.bugueno@alumnos.ucn.cl"}, {"nombre_completo": "MARION FRANCISCA ALFARO DELGADO", "email": "marion.alfaro@alumnos.ucn.cl"}, {"nombre_completo": "YEIMMY ALEJANDRA ANTONIET CASTRO ROJAS", "email": "yeimmy.castro@alumnos.ucn.cl"}]}, {"codigo": "INN4", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“Uso de Residuos de Conchas de Ostión para la Producción de Cal Viva Impactando Positivamente en la Reducción de Residuos Orgánicos en el Vertedero Municipal de", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=18elpmanVKcvA0WVKdkckkmJfLiHfObIK", "evaluador1": "KARLA SORIA", "evaluador2": "RODRIGO SFEIR", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "JOSIP GORAN PAPIC PINO", "email": "josip.papic@alumnos.ucn.cl"}, {"nombre_completo": "MARION FRANCISCA MARTINEZ LEYTON", "email": "marion.martinez@alumnos.ucn.cl"}, {"nombre_completo": "ORNELA JANETT PASTEN GONZALEZ", "email": "ornela.pasten@alumnos.ucn.cl"}]}, {"codigo": "INN5", "area": "[Innovación (Dr. Tomás Bas)]", "titulo": "“MITIGACIÓN DE OLORES MOLESTOS EN LA COMUNIDAD UNIVERSITARIA UCN Y SU ENTORNO: PROPUESTA INNOVADORA PARA LA", "profesor_guia": "TOMÁS BAS", "link_informe": "https://drive.google.com/open?id=1gMIRkVxVZ-C7uVM9kVU4VM_wQ4UKssLh", "evaluador1": "KAREN VARGAS", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "STELLA FRANCISCA CASANGA LOPEZ", "email": "stella.casanga@alumnos.ucn.cl"}, {"nombre_completo": "THOMAS PATRICIO CADENA ROJAS", "email": "thomas.cadena@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA MONSERRATT ARANCIBIA CELIS", "email": "valentina.arancibia01@alumnos.ucn.cl"}]}, {"codigo": "PES1", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Moda Tras Pandemia", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1vgxtEOB3VUJGlKAF77J9f2idyZnxIlhr", "evaluador1": "OSWALDO TERÁN", "evaluador2": "RODRIGO FLORES GUERRERO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "JANIS ALEXANDRA VARGAS LILLO", "email": "janis.vargas@alumnos.ucn.cl"}, {"nombre_completo": "MONICA YULITZA CORTES RENTERIA", "email": "monica.cortes@alumnos.ucn.cl"}, {"nombre_completo": "VALERIA ANAIS GUERRA ARACENA", "email": "valeria.barraza01@alumnos.ucn.cl"}]}, {"codigo": "PES2", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Deserción Pymes", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1-WEu-KmrwVjO7xnHDLSqXp8KPuqhQ10r", "evaluador1": "OSWALDO TERÁN", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ALEXANDRA BELEN LATUZ PIÑONES", "email": "alexandra.latuz@alumnos.ucn.cl"}, {"nombre_completo": "BELEN  CERDA CORTES", "email": "belen.cerda@alumnos.ucn.cl"}, {"nombre_completo": "FRANCISCO GUSTAVO MARIN MAGALLANES", "email": "francisco.marin01@alumnos.ucn.cl"}]}, {"codigo": "PES3", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Planificacion Estratégica San Francisco", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1epuzqgSKAflHvxCAksEHPQJ9TV6et1Vx", "evaluador1": "OSWALDO TERÁN", "evaluador2": "VICTOR PIZARRO ARAYA*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DANIELA ARACELY ORREGO CONTRERAS", "email": "daniela.orrego@alumnos.ucn.cl"}, {"nombre_completo": "KRISHNA CATALINA CONTRERAS SANTANDER", "email": "krishna.contreras02@alumnos.ucn.cl"}, {"nombre_completo": "PATRICIO IGNACIO FABRES NUÑEZ", "email": "patricio.fabres@alumnos.ucn.cl"}]}, {"codigo": "PES4", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Inteligencia Artificial en UCN", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1TIrTiCLBB8XwYNLIhZ8oDZ37Zkz_iilj", "evaluador1": "OSWALDO TERÁN", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ANAYELLY ANDREA EGAÑA SANTANDER", "email": "anayelly.egana@alumnos.ucn.cl"}, {"nombre_completo": "JORDAN NIBALDO VILLALOBOS CABRERA", "email": "jordan.villalobos@alumnos.ucn.cl"}, {"nombre_completo": "MAXIMILIANO ALFONSO ROJAS VILLALOBOS", "email": "maximiliano.rojas04@alumnos.ucn.cl"}]}, {"codigo": "PES5", "area": "[Planificación Estratégica (Andrés Araya)]", "titulo": "Plan Estratégico Empresa Century", "profesor_guia": "ANDRÉS ARAYA", "link_informe": "https://drive.google.com/open?id=1rSGQB02bUvMbhVS8vWaNEp9YH522HM3g", "evaluador1": "OSWALDO TERÁN", "evaluador2": "MIRZA CEQUEA", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FIORELLA ISABEL ARAYA PARRA", "email": "fiorella.araya@alumnos.ucn.cl"}, {"nombre_completo": "JOAQUIN IGNACIO INOSTROZA SEGOVIA", "email": "joaquin.inostroza@alumnos.ucn.cl"}, {"nombre_completo": "VALERIA CAROLINA BARRAZA TAPIA", "email": "valeria.guerra@alumnos.ucn.cl"}]}, {"codigo": "DBD1", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Impacto de la actividad física y la exigencia académica en el rendimiento académico y bienestar de los estudiantes universitarios", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1D8JfNt2QyGO2g2HT0MmkoDzrkU5ENlab", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "BORIS BUGUEÑO", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "MARIO ESTEBAN CASTILLO BUSTOS", "email": "mario.castillo01@alumnos.ucn.cl"}, {"nombre_completo": "PEDRO ABSALON ANTONIO RAMOS VILLAGRA", "email": "pedro.ramos@alumnos.ucn.cl"}]}, {"codigo": "DBD2", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Sistema basado aprendizaje automático  para apoyar la gestión de servicios de seguridad en lugares públicos de Chile", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1umfXbfWsT0SnfNg92V9SrmV-A3W5x9eK", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "BORIS BUGUEÑO", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "DAVID ANTONIO CORTES JOVE", "email": "david.cortes@alumnos.ucn.cl"}, {"nombre_completo": "JOSE VICENTE CORDERO BREVIS", "email": "jose.cordero@alumnos.ucn.cl"}, {"nombre_completo": "MICHELL ANTOIS VEGA IBACETA", "email": "michell.rossel@alumnos.ucn.cl"}]}, {"codigo": "DBD3", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Diseño de un plan de Control de Gestión para Perfomin Mina La Niña", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1SosG1ygnJgpzlPh6dk_sFlubNb2WH4in", "evaluador1": "VANNESSA DUARTE", "evaluador2": "CATALINA VARELA TORREJÓN*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "KARLA VALERIA CAIMANQUE RODRIGUEZ", "email": "karla.caimanque@alumnos.ucn.cl"}, {"nombre_completo": "ROCIO JOSEFA RIVERA BONILLA", "email": "rocio.rivera02@alumnos.ucn.cl"}]}, {"codigo": "DBD4", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Clasificación y evaluación de rutas críticas del sistema aéreo nacional chileno mediante análisis de redes: un enfoque desde grandes volúmenes de datos logístico y ambiental", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1_oyxJWHTb1vR8N_tHJJm7Fnp88M3W2DS", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "VANNESSA DUARTE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ANGIE LIZBETH DE LA TORRE MALDONADO", "email": "angie.delatorre@alumnos.ucn.cl"}, {"nombre_completo": "MICHEL ANNAIS APPELGREN GONZALEZ", "email": "michel.appelgren@alumnos.ucn.cl"}, {"nombre_completo": "VIVI-ANN MARGARITA FLORES MARTINEZ", "email": "viviann.flores@alumnos.ucn.cl"}]}, {"codigo": "DBD5", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Análisis de los macrodatos en la gestión de personas en el sector público educativo", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=13GYJK_wp_CIIPTMROJ8dHgn5mlOCoCfn", "evaluador1": "ANDRÉS VALLONE", "evaluador2": "VANNESSA DUARTE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "PATRICIO ANDRES VILCHES TOLEDO", "email": "patricio.vilches@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA AYALEN FERNANDEZ HIDALGO", "email": "valentina.fernandez01@alumnos.ucn.cl"}]}, {"codigo": "DBD6", "area": "[Digitalización y Big Data (Dr. Oswaldo Terán)]", "titulo": "Factores claves en el desempeño académico: Un enfoque basado en estudios y análisis de datos", "profesor_guia": "OSWALDO TERÁN", "link_informe": "https://drive.google.com/open?id=1OV6W-xoK-3yiRxmnPgT71s3slt4nyCfB", "evaluador1": "FERNANDO GONZÁLEZ", "evaluador2": "VANNESSA DUARTE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ARIEL MAURICIO VARGAS MONTECINOS", "email": "ariel.vargas@alumnos.ucn.cl"}, {"nombre_completo": "KRISHNA FERNANDA SOTO PEREZ", "email": "krishna.soto@alumnos.ucn.cl"}, {"nombre_completo": "VALENTINA JAVIERA BELEN LAFFERTE GUTIERREZ", "email": "valentina.lafferte@alumnos.ucn.cl"}]}, {"codigo": "SIA1", "area": "[SIA (Dra. Vannessa Duarte)]", "titulo": "sistema, gestión logística y clientes, aguas Paitanas", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1lZkCTc-LXnahpe5roqSavlL-yqdvv9tQ", "evaluador1": "NATALIA ARAYA", "evaluador2": "CARLOS VERGARA*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "BELEN MARLENY GOMEZ PARRA", "email": "belen.gomez@alumnos.ucn.cl"}, {"nombre_completo": "CAROLINA ALEJANDRA CARVAJAL RIVAS", "email": "carolina.carvajal02@alumnos.ucn.cl"}]}, {"codigo": "SIA2", "area": "[SIA (Dra. Vannessa Duarte)]", "titulo": "sistemas, trazabilidad y asistencia, campeones para Coquimbo", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1b4fMUyZYe4SgvL4iUTr3X5Bbq8erzgz4", "evaluador1": "NATALIA ARAYA", "evaluador2": "CLAUDIO MUÑOZ*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CAROLINA ALEJANDRA OPAZO ROJAS", "email": "carolinaopazo.r6@gmail.com"}, {"nombre_completo": "CATALINA ANAIS ORDENES OLMOS", "email": "catalina.ordenes@alumnos.ucn.cl"}, {"nombre_completo": "CONSTANZA MARIA DE LOS AN ALVAREZ BARRAZA", "email": "constanza.alvarez03@alumnos.ucn.cl"}]}, {"codigo": "SIA3", "area": "[SIA (Dra. Vannessa Duarte)]", "titulo": "sistema, reportes de emergencia, bomberos Coquimbo", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1D8DmlS1-OyvVZGH3qz4d3rzwkkK0KbXs", "evaluador1": "BORIS BUGUEÑO", "evaluador2": "JUAN COLLAO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "IGNACIA VALENTINA PETIT PINTO", "email": "ignacia.petit@alumnos.ucn.cl"}, {"nombre_completo": "LORENA ANDREA NAVARRO BARRAZA", "email": "lorena.navarro@alumnos.ucn.cl"}, {"nombre_completo": "RENATO ALBERTO VARGAS PACHECO", "email": "renato.vargas@alumnos.ucn.cl"}]}, {"codigo": "INT1", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "modelo integración datos, reclutamiento, Codelco", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1kFolrW85LMomt1Jre9LQa4hiVX_yxWT_", "evaluador1": "SOFÍA ORAZI", "evaluador2": "PATRICIA CASTILLO*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "DANIEL ALEJANDRO CARDENAS VILLAR", "email": "ahpdaniel98@gmail.com"}, {"nombre_completo": "NICOLAS GASTON PEFAUR YAPUR", "email": "nicolas.pefaur@alumnos.ucn.cl"}]}, {"codigo": "INT2", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "integración de datos, proceso embalaje, RioBlanco", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1FTLyOx1PrSRvZozzyb2WVmuZPPD85KLC", "evaluador1": "SOFÍA ORAZI", "evaluador2": "CRISTIAN RECKAMM*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "CATALINA JOSE SANTANDER ULLOA", "email": "catalina.santander01@alumnos.ucn.cl"}, {"nombre_completo": "NICOLY QUINTINO DE OLIVEIRA", "email": "nicoly.quintino@alumnos.ucn.cl"}, {"nombre_completo": "NILISE YULIETTE LEON CONCHA", "email": "nilise.leon@alumnos.ucn.cl"}]}, {"codigo": "INT3", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "integracón de datos VCM ECIEM", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1APMGWY2aXReRlG7_peKNUncB6p9Zpubk", "evaluador1": "SOFÍA ORAZI", "evaluador2": "CRISTIAN MORALES", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "FRANCO JOSE EMANUEL LIZARDI CUELLO", "email": "franco.lizardi@alumnos.ucn.cl"}, {"nombre_completo": "NAYELI FELICIANA GOMEZ SEVERINO", "email": "nayeli.gomez@alumnos.ucn.cl"}]}, {"codigo": "INT4", "area": "[Inteligencia de Negocios (Dra. Vannessa Duarte)]", "titulo": "integración de datos financieros y de operaciones del canal Bellavista", "profesor_guia": "VANNESSA DUARTE", "link_informe": "https://drive.google.com/open?id=1owKfrpfIwgGqtfM9ul--HseSX255vdq8", "evaluador1": "SOFÍA ORAZI", "evaluador2": "MANUEL DOMÍNGUEZ*", "es_externo_eval1": false, "es_externo_eval2": true, "estudiantes": [{"nombre_completo": "NICOLAS BACHELET TELLO", "email": "nicolas.bachelet@alumnos.ucn.cl"}, {"nombre_completo": "SOFIA BELEN AGUILERA GUERRERO", "email": "sofia.aguilera@alumnos.ucn.cl"}]}, {"codigo": "PCG1", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Trabajo decente y calidad educativa en escuelas públicas de la región de Coquimbo post pandemia", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=16gO-QZ-kxmDzWO5OMoTYWYm8ZIotqB78", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CONSTANZA ALEJANDRA CABRERA CARRASCO", "email": "constanza.cabrera@alumnos.ucn.cl"}, {"nombre_completo": "FRANK MICHELL SALDIBAR GONZALEZ", "email": "frank.saldibar@alumnos.ucn.cl"}]}, {"codigo": "PCG2", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Salario emocional y su influencia en el compromiso laboral de docentes de educación superior", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1GxMlydNOZJrZJYQ-eW6MJcHXNM5Raney", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "KIMBERLY ANDREA MADRIAGA BOLBARAN", "email": "kimberly.madriaga@alumnos.ucn.cl"}, {"nombre_completo": "ROSARIO PAZ BENAVIDES FLORES", "email": "rosario.benavides@alumnos.ucn.cl"}]}, {"codigo": "PCG3", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Estrategias de Economía Circular para la Gestión de Residuos sólidos en Microempresas de Construcción en Chile", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1RnYhK7FTmz0Ox3v2wooilaSKBtfrN-tl", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ELIZABETH ROCIO BOLADOS ROJAS", "email": "elizabeth.bolados@alumnos.ucn.cl"}, {"nombre_completo": "FERNANDA INES CORTES ARAYA", "email": "fernanda.cortes@alumnos.ucn.cl"}, {"nombre_completo": "NICOLAS ARMANDO ROSALES CARMONA", "email": "nicolas.rosales@alumnos.ucn.cl"}]}, {"codigo": "PCG4", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Plan estratégico para mejorar la competitividad y sustentabilidad en temporada baja en el Aparthotel Marsella de Bahía Inglesa.", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1KBQeKrKiiB4DUHqx28f4ZNe9F4yf0j_9", "evaluador1": "SERGIO ZÚÑIGA", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "DAFNE MACARENA ARENAS NAVEA", "email": "dafne.arenas@alumnos.ucn.cl"}, {"nombre_completo": "LAURA ALEJANDRA ZEBALLOS CARVAJAL", "email": "laura.zeballos@alumnos.ucn.cl"}, {"nombre_completo": "MACARENA PATRICIA BAQUEDANO FIGUEROA", "email": "macarena.baquedano@alumnos.ucn.cl"}]}, {"codigo": "PCG5", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Diseño de modelo de control de gestión para evaluar la efectividad del apoyo empresarial de CORFO en Coquimbo desde el 2022  al 2024", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1w93PU-zhR4qTPFgyGokiVM9ssnHtTNx5", "evaluador1": "KAREN VARGAS", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "ANA VALENTINA CONTRERAS PEREZ", "email": "ana.contreras@alumnos.ucn.cl"}, {"nombre_completo": "CAMILA MAKARENA SARMIENTO ARAYA", "email": "camila.sarmiento@alumnos.ucn.cl"}, {"nombre_completo": "MONSERRAT ISIDORA ABDALA OLIVEROS", "email": "monserrat.abdala@alumnos.ucn.cl"}]}, {"codigo": "PCG6", "area": "[Planificación y Control de Gestión P1 (Dra. Mirza Cequea)]", "titulo": "Propuesta de planificación estratégica basada en la norma ISO9001:2015 para la empresa ferretera y gases industriales Cevin S.A", "profesor_guia": "MIRZA CEQUEA", "link_informe": "https://drive.google.com/open?id=1RUrGJDMP3Qfc9anJAkz81OxL5_qlMXAx", "evaluador1": "KAREN VARGAS", "evaluador2": "CARLA ANDRADE", "es_externo_eval1": false, "es_externo_eval2": false, "estudiantes": [{"nombre_completo": "CAMILO IGNACIO TAPIA SANTANDER", "email": "camilo.tapia01@alumnos.ucn.cl"}, {"nombre_completo": "MARTIN ANDRES IDUYA TAPIA", "email": "martin.iduya@alumnos.ucn.cl"}]}];
         
+        // Elementos del DOM - Tab Evaluador
         const tipoEvaluadorSelect = document.getElementById('tipoEvaluador');
         const nombreEvaluadorSelect = document.getElementById('nombreEvaluador');
         const countBadge = document.getElementById('countBadge');
-        const resultsSection = document.getElementById('resultsSection');
+        const resultsEvaluador = document.getElementById('resultsEvaluador');
         
-        // Event listeners
+        // Elementos del DOM - Tab Profesor
+        const nombreProfesorSelect = document.getElementById('nombreProfesor');
+        const countProfesorBadge = document.getElementById('countProfesorBadge');
+        const resultsProfesor = document.getElementById('resultsProfesor');
+        
+        // Event listeners - Tab Evaluador
         tipoEvaluadorSelect.addEventListener('change', handleTipoChange);
         nombreEvaluadorSelect.addEventListener('change', handleEvaluadorChange);
         
+        // Event listeners - Tab Profesor
+        nombreProfesorSelect.addEventListener('change', handleProfesorChange);
+        
+        // Inicializar desplegable de profesores
+        initProfesoresDropdown();
+        
+        function switchTab(tabName) {
+            // Actualizar botones
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Actualizar contenido
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+        
+        function initProfesoresDropdown() {
+            const profesoresMap = new Map();
+            
+            SEMINARIOS_DATA.forEach(sem => {
+                const profesor = sem.profesor_guia;
+                if (!profesoresMap.has(profesor)) {
+                    profesoresMap.set(profesor, {
+                        area: sem.area,
+                        count: 0
+                    });
+                }
+                profesoresMap.get(profesor).count++;
+            });
+            
+            const profesoresOrdenados = Array.from(profesoresMap.entries())
+                .sort((a, b) => a[0].localeCompare(b[0]));
+            
+            let options = '<option value="">-- Seleccione un profesor guía --</option>';
+            profesoresOrdenados.forEach(([nombre, info]) => {
+                options += `<option value="${nombre}">${nombre}</option>`;
+            });
+            
+            nombreProfesorSelect.innerHTML = options;
+            countProfesorBadge.textContent = `${profesoresOrdenados.length} profesores`;
+        }
+        
+        function handleProfesorChange() {
+            const profesor = nombreProfesorSelect.value;
+            
+            if (!profesor) {
+                mostrarMensajeInicialProfesor();
+                return;
+            }
+            
+            mostrarSeminariosProfesor(profesor);
+        }
+        
+        function mostrarMensajeInicialProfesor() {
+            resultsProfesor.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">📚</div>
+                    <h3>Seleccione un profesor guía</h3>
+                    <p>Use el desplegable superior para ver todos los seminarios de su área</p>
+                </div>
+            `;
+            actualizarEstadisticasProfesor(0, 0, 0);
+        }
+        
+        function mostrarSeminariosProfesor(profesor) {
+            const seminariosArea = SEMINARIOS_DATA.filter(sem => sem.profesor_guia === profesor);
+            
+            if (seminariosArea.length === 0) {
+                resultsProfesor.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">❌</div>
+                        <h3>No se encontraron seminarios</h3>
+                        <p>Este profesor no tiene seminarios asignados</p>
+                    </div>
+                `;
+                actualizarEstadisticasProfesor(0, 0, 0);
+                return;
+            }
+            
+            const area = seminariosArea[0].area;
+            
+            const html = `
+                <div class="profesor-info">
+                    <div class="profesor-nombre">👨‍🏫 ${profesor}</div>
+                    <div class="profesor-area">${area.replace(/\[|\]/g, '')}</div>
+                </div>
+                
+                ${seminariosArea.map(sem => `
+                    <div class="seminario-card">
+                        <div class="seminario-header">
+                            <div class="seminario-codigo">${sem.codigo}</div>
+                            <div class="seminario-area">${sem.area.replace(/\[|\]/g, '')}</div>
+                        </div>
+                        
+                        <div class="seminario-titulo">${sem.titulo}</div>
+                        
+                        <div class="estudiantes-section">
+                            <div class="estudiantes-title">Estudiantes (${sem.estudiantes.length}):</div>
+                            ${sem.estudiantes.map(est => `
+                                <div class="estudiante-item">
+                                    <span class="estudiante-nombre">${est.nombre_completo}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="${sem.link_informe}" target="_blank" class="link-informe">
+                                Ver Informe →
+                            </a>
+                            <div style="padding: 12px; background: #f7fafc; border-radius: 8px; font-size: 0.9em; color: #4a5568;">
+                                <strong>Evaluadores:</strong> ${sem.evaluador1} • ${sem.evaluador2}
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+            
+            resultsProfesor.innerHTML = html;
+            
+            const totalEstudiantes = seminariosArea.reduce((sum, sem) => sum + sem.estudiantes.length, 0);
+            const evaluadoresSet = new Set();
+            seminariosArea.forEach(sem => {
+                evaluadoresSet.add(sem.evaluador1);
+                evaluadoresSet.add(sem.evaluador2);
+            });
+            
+            actualizarEstadisticasProfesor(seminariosArea.length, totalEstudiantes, evaluadoresSet.size);
+        }
+        
+        function actualizarEstadisticasProfesor(total, estudiantes, evaluadores) {
+            document.getElementById('statTotalProfesor').textContent = total;
+            document.getElementById('statEstudiantesProfesor').textContent = estudiantes;
+            document.getElementById('statEvaluadores').textContent = evaluadores;
+        }
+        
+        // Funciones del Tab Evaluador (mantienen su lógica original)
         function handleTipoChange() {
             const tipo = tipoEvaluadorSelect.value;
             nombreEvaluadorSelect.value = '';
@@ -486,7 +760,6 @@
                 return;
             }
             
-            // Obtener lista de evaluadores según tipo
             const esExterno = tipo === 'externo';
             const evaluadoresMap = new Map();
             
@@ -499,11 +772,9 @@
                 }
             });
             
-            // Ordenar evaluadores alfabéticamente
             const evaluadoresOrdenados = Array.from(evaluadoresMap.keys())
                 .sort((a, b) => a.localeCompare(b));
             
-            // Poblar el select SIN número de seminarios
             let options = '<option value="">-- Seleccione un evaluador --</option>';
             evaluadoresOrdenados.forEach(nombre => {
                 options += `<option value="${nombre}">${nombre}</option>`;
@@ -512,7 +783,6 @@
             nombreEvaluadorSelect.innerHTML = options;
             nombreEvaluadorSelect.disabled = false;
             
-            // Mostrar badge con cantidad
             countBadge.textContent = `${evaluadoresOrdenados.length} disponibles`;
             countBadge.style.display = 'inline-block';
             
@@ -532,7 +802,7 @@
         }
         
         function mostrarMensajeInicial() {
-            resultsSection.innerHTML = `
+            resultsEvaluador.innerHTML = `
                 <div class="no-results">
                     <div class="no-results-icon">📚</div>
                     <h3>Seleccione un tipo de evaluador para comenzar</h3>
@@ -544,7 +814,7 @@
         
         function mostrarMensajeSeleccion(tipo) {
             const tipoTexto = tipo === 'academico' ? 'académico' : 'externo';
-            resultsSection.innerHTML = `
+            resultsEvaluador.innerHTML = `
                 <div class="no-results">
                     <div class="no-results-icon">👤</div>
                     <h3>Seleccione un evaluador ${tipoTexto}</h3>
@@ -555,13 +825,12 @@
         }
         
         function mostrarSeminarios(evaluador) {
-            // Filtrar seminarios donde el evaluador está asignado
             const seminariosAsignados = SEMINARIOS_DATA.filter(sem => 
                 sem.evaluador1 === evaluador || sem.evaluador2 === evaluador
             );
             
             if (seminariosAsignados.length === 0) {
-                resultsSection.innerHTML = `
+                resultsEvaluador.innerHTML = `
                     <div class="no-results">
                         <div class="no-results-icon">❌</div>
                         <h3>No se encontraron seminarios</h3>
@@ -572,7 +841,6 @@
                 return;
             }
             
-            // Determinar tipo de evaluador
             const esExterno = evaluador.includes('*');
             const tipoTexto = esExterno ? 'Evaluador Externo' : 'Académico ECIEM';
             
@@ -609,9 +877,8 @@
                 `).join('')}
             `;
             
-            resultsSection.innerHTML = html;
+            resultsEvaluador.innerHTML = html;
             
-            // Actualizar estadísticas
             const totalEstudiantes = seminariosAsignados.reduce((sum, sem) => 
                 sum + sem.estudiantes.length, 0
             );
